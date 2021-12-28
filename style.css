@@ -1,0 +1,33 @@
+.google-map {
+    height: 250px;
+    width: 400px;
+    background-color: orange
+}
+.outer-body {
+    display: flex;
+    flex-direction: column;
+}
+.inner-body {
+    margin: 50px auto 0px auto;
+}
+
+.search-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.option {
+    display: flex;
+    margin: 25px auto 0px auto;
+}
+.random-button {
+    height: 40px;
+    width: 95%;
+    margin: 25px auto 25px auto;
+}
+.result-card {
+    margin-top: 15px;
+    width: 400px;
+    height: 250px;
+    background-color: mediumslateblue;
+}

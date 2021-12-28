@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>What Do You Want?</title>
+        <script defer async src="./places-data.js"></script>
+        <script defer async src="./on-load.js"></script>
+        <script defer async src="./common.js"></script>
+        <script defer async src="./key_details.js"></script>
+        <link rel="stylesheet" href="./style.css">
+        <!-- <script defer async
+            src=`https://maps.googleapis.com/maps/api/js?key=${google_key}&libraries=places&callback=initMap`>
+        </script> -->
+    </head>
+    <body>
+        <div class="outer-body">
+            <div class="inner-body">
+                <div class="search-options">
+                    <div class="option">
+                        <div>Search Distance Radius:</div>
+                        <input id="radius-input" type="number">
+                        <div>Miles</div>
+                    </div>
+
+                    <button class="random-button" onclick="searchNearby()">Restaurant Roulette</button>
+                </div> 
+                <div id="google-map" class="google-map"></div>
+                <div id="result-card" class="result-card"></div>
+            </div>
+        </div>
+    </body>
+</html>

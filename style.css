@@ -31,6 +31,7 @@
     width: 400px;
     background-color: #f8f8ff;
     border-radius: 25px;
+    display: none;
 }
 
 .result-card-text{

@@ -14,6 +14,9 @@ function initMap() {
     })
     infoWindow = new google.maps.InfoWindow();
     placeService = new google.maps.places.PlacesService(map);
+    map.addListener("click", (mapsMouseEvent)=> {
+      dropInfoWindow(mapsMouseEvent)
+    })
     getUserLocation();
 };
 
@@ -37,4 +40,13 @@ function getUserLocation() {
     } else {
         alert("Your browers does not support gelocation.")
     }
+}
+function dropInfoWindow(mapsMouseEvent){
+  infoWindow.close();
+  infoWindow.setPosition(mapsMouseEvent.latLng)
+  infoWindow.setContent("Search around here.");
+  infoWindow.open(map);
+  map.setCenter(mapsMouseEvent.latLng);
+  currentPos = mapsMouseEvent.latLng;
+  constructCircle();
 }

@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>What Do You Want?</title>
-        <script defer async src="./places-data.js"></script>
         <script defer async src="./on-load.js"></script>
         <script defer async src="./common.js"></script>
         <link rel="stylesheet" href="./style.css">
@@ -20,7 +19,7 @@
                         <div>Miles</div>
                     </div>
 
-                    <button class="random-button" onclick="searchNearby()">Restaurant Roulette</button>
+                    <button id="random-button" class="random-button" onclick="searchNearby()">Restaurant Roulette</button>
                 </div> 
                 <div id="google-map" class="google-map"></div>
                 <div id="result-card" class="result-card">

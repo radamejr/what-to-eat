@@ -2,6 +2,8 @@ let chosenPlace;
 let storage =  window.localStorage;
 let filteredResults;
 let request;
+let allPagesResults = [];
+let resultMarker;
 
 function constructCircle() {
   if (!searchCircle){
@@ -25,49 +27,49 @@ function searchNearby(){
   const hasSearch = checkRadiusValue();
   const hasPos = checkPositionValue();
   if(hasSearch && hasPos){
+    document.getElementById("random-button").disabled = true
     const hasCached = checkCachedSearch();
     if(hasCached){
       console.log("This is a cached result, cache is kept for a week.")
-      handleSearchResults(hasCached, true)
+      allPagesResults = JSON.parse(hasCached);
+      filterSearchResults()
     } else {
       service = new google.maps.places.PlacesService(map);
       request = {
         location: currentPos,
-        radius: searchRadius,
+        radius: searchRadius * 1609.344,
+        openNow: true,
       }
-    service.nearbySearch(request, handleSearchResults);
+      service.nearbySearch(request, handleSearchResults);
     }
   }
 }
 // add check for status and to send results to filter.
-function handleSearchResults(results, status) {
-  filtered = filterResults(mockResults);
-  filteredResults = filtered;
-  if(filterResults.length > 0){
-    chosenPlace = filteredResults[Math.floor(Math.random()*filteredResults.length)];
-    setTimeout(() => {
-      setWithExpiry(currentPos.lat + currentPos.lng + searchRadius, JSON.stringify(chosenPlace))
-      buildResultCard();
-    }, 500)
+function handleSearchResults(results, status, pagination) {
+  if(status != "OK") return;
+  results.forEach((place) => {
+    allPagesResults.push(place);
+  });
+  if(pagination && pagination.hasNextPage){
+    pagination.nextPage();
   } else {
-    alert("No places found within range");
+    setWithExpiry(currentPos.lat + currentPos.lng + searchRadius, JSON.stringify(allPagesResults), 604800000)
+    filterSearchResults()
   }
+}
+
+function filterSearchResults(){
+    filteredResults = filterResults(allPagesResults);
+    if(filteredResults.length > 0){
+      selectRandomPlace();
+    } else {
+      alert("No places found within range");
+    }
 }
 
 function filterResults(results){
   filtered = results.filter((result) => {
       if (result.types.indexOf("food") > -1){
-        placeService.getDetails({ placeId: result.place_id }, (place, status) => {
-          if (status == google.maps.places.PlacesServiceStatus.OK) {
-            result.address = place.formatted_address;
-            result.phone = place.formatted_phone_number;
-            result.rating = place.rating;
-            result.user_ratings_total = place.user_ratings_total;
-            result.website = place.website;
-            result.isOpen = place.opening_hours.isOpen();
-            result.days_open = place.opening_hours.weekday_text;
-          }
-        })
         return result
       }
     } 
@@ -101,7 +103,6 @@ function checkCachedSearch(){
 
 // generate card data.
 function buildResultCard() {
-  console.log(chosenPlace);
   document.getElementById('result-card-name').innerHTML = chosenPlace.name;
   document.getElementById('result-card-address').innerHTML = chosenPlace.address;
   document.getElementById('result-card-number').innerHTML = chosenPlace.phone;
@@ -110,9 +111,11 @@ function buildResultCard() {
   document.getElementById('result-card-rating-count').innerHTML = "Total Reviews: " + chosenPlace.user_ratings_total;
   hoursList = document.getElementById('result-hours-list');
   hoursList.innerHTML = ""
-  chosenPlace.days_open.forEach((day) => {
+  chosenPlace.days_open?.forEach((day) => {
     buildHoursLine(hoursList, day);
   })
+  document.getElementById('result-card').style.display = "block"
+  document.getElementById("random-button").disabled = false
 }
 
 function buildHoursLine(ul, day) {
@@ -123,7 +126,7 @@ function buildHoursLine(ul, day) {
 }
 
 // set a cache of the radius/location query to avoid hitting endpoint if needed.
-function setWithExpiry(key, value){
+function setWithExpiry(key, value, ttl){
   const now = new Date();
   const item = {
     value: value,
@@ -148,11 +151,62 @@ function getWithExpiry(key) {
 }
 
 function handleRadiusChange() {
-  console.log("radius changed")
   const radiusValue = parseInt(document.getElementById("radius-input").value);
   if(isNaN(radiusValue) || radiusValue <= 0){
     return
   }
   searchRadius = radiusValue
   constructCircle()
+}
+
+function getPlaceDetails(id) {
+  let cachedPlace = getWithExpiry(id)
+  if(cachedPlace){
+    chosenPlace = cachedPlace;
+    console.log("Place was cached within 24hours, using that.")
+  } else {
+    placeService.getDetails({ placeId: id }, (place, status) => {
+      if (status == google.maps.places.PlacesServiceStatus.OK) {
+        chosenPlace = Object.assign(chosenPlace, { address: place.formatted_address } )
+        chosenPlace = Object.assign(chosenPlace, { phone: place.formatted_phone_number})
+        chosenPlace = Object.assign(chosenPlace, { rating: place.rating})
+        chosenPlace = Object.assign(chosenPlace, { user_rating_total: place.user_ratings_total })
+        chosenPlace = Object.assign(chosenPlace, { website: place.website})
+        chosenPlace = Object.assign(chosenPlace, { isOpen: place.opening_hours.isOpen()})
+        chosenPlace = Object.assign(chosenPlace, { days_open: place.opening_hours.weekday_text})
+      }
+    })
+    setTimeout(() => {
+      setWithExpiry(id, chosenPlace, 86400000);
+    }, 500);
+  }
+  
+}
+
+function selectRandomPlace() {
+  newPlace = filteredResults[Math.floor(Math.random()*filteredResults.length)];
+  if(newPlace.name !== chosenPlace?.name){
+    chosenPlace = newPlace;
+    getPlaceDetails(chosenPlace.place_id)
+    setTimeout(() => {
+      buildResultCard();
+      dropMarker(chosenPlace.geometry.location, chosenPlace.name)
+    }, 1000)
+  } else {
+    console.log("Place was not open or was the same. Trying again.", newPlace)
+    selectRandomPlace();
+  }
+}
+
+function dropMarker(locationPosition, locationName) {
+  if(!resultMarker){
+    resultMarker = new google.maps.Marker({
+      position: locationPosition,
+      title: locationName,
+    })
+    resultMarker.setMap(map);
+  } else {
+    resultMarker.setPosition(locationPosition);
+    resultMarker.setTitle(locationName);
+  }
 }

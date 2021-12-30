@@ -4,9 +4,6 @@ let infoWindow;
 let searchCircle;
 let searchRadius;
 
-window.onload = () => {
-  getUserLocation();
-}
 function initMap() {
     map = new google.maps.Map(document.getElementById("google-map"), {
         center: { lat: -34.397, lng: 150.644 },

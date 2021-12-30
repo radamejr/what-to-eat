@@ -1,7 +1,7 @@
 .google-map {
     height: 250px;
     width: 400px;
-    background-color: orange
+    border-radius: 25px;
 }
 .outer-body {
     display: flex;
@@ -24,10 +24,41 @@
     height: 40px;
     width: 95%;
     margin: 25px auto 25px auto;
+    border-radius: 10px;
 }
 .result-card {
     margin-top: 15px;
     width: 400px;
-    height: 250px;
-    background-color: mediumslateblue;
+    background-color: #f8f8ff;
+    border-radius: 25px;
+}
+
+.result-card-text{
+    margin: 5px 0px 0px 20px;
+    font-size: 16px;
+}
+
+.card-splitter {
+	border-top: 1px solid black;
+    width: 75%;
+    margin-top: 20px;
+}
+#result-card-inner {
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    justify-content: space-between;
+}
+#result-hours-list{
+    list-style: none;
+    padding: 0px;
+}
+#result-card-outer-body{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+#result-card-name {
+    font-size: 20px;
 }

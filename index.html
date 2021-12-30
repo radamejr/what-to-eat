@@ -5,11 +5,10 @@
         <script defer async src="./places-data.js"></script>
         <script defer async src="./on-load.js"></script>
         <script defer async src="./common.js"></script>
-        <script defer async src="./key_details.js"></script>
         <link rel="stylesheet" href="./style.css">
-        <!-- <script defer async
-            src=`https://maps.googleapis.com/maps/api/js?key=${google_key}&libraries=places&callback=initMap`>
-        </script> -->
+        <script defer async
+            src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4B35yGnYigE4UhxqTOXr4W8OSymkIJo8&libraries=places&callback=initMap'>
+        </script>
     </head>
     <body>
         <div class="outer-body">
@@ -17,14 +16,33 @@
                 <div class="search-options">
                     <div class="option">
                         <div>Search Distance Radius:</div>
-                        <input id="radius-input" type="number">
+                        <input onkeyup="handleRadiusChange()" onchange="handleRadiusChange()" id="radius-input" type="number">
                         <div>Miles</div>
                     </div>
 
                     <button class="random-button" onclick="searchNearby()">Restaurant Roulette</button>
                 </div> 
                 <div id="google-map" class="google-map"></div>
-                <div id="result-card" class="result-card"></div>
+                <div id="result-card" class="result-card">
+                    <div id="result-card-outer-body">
+                        <div id="result-card-inner">
+                            <div class="result-card-details">
+                                <div id="result-card-name" class="result-card-text">Name</div>
+                                <div id="result-card-address" class="result-card-text">Address</div>
+                                <div id="result-card-number" class="result-card-text">Phone Number</div> 
+                                <a id="result-card-website" target="_blank" class="result-card-text">website</a>
+                                <div id="result-card-rating" class="result-card-text">Rated: #</div>
+                                <div id="result-card-rating-count" class="result-card-text">Total Ratings #</div>
+                            </div>
+                            <hr class="card-splitter"></hr>
+                            <div id="result-card-hours">
+                                <ul id="result-hours-list">
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
